@@ -2,16 +2,8 @@
 
 '''This script draws a sample abundance bubble chart ordered by the leaves on a phylogenetic tree. Samples are ordered and colored by a metadata category. Useage: python3 bubble_tree.py -b <biom.txt> -m <mapping.txt> -t <tree.newick> -c <category>'''
 
-import pandas as pd
-import matplotlib.pyplot as plt
-import networkx as nx
-import numpy as np
-import seaborn as sns
-import matplotlib.patches as mpatches
-import argparse
-from Bio import Phylo
-from itertools import repeat
 
+import argparse
 parser = argparse.ArgumentParser()
 requireparser = parser.add_argument_group('required arguments')
 
@@ -20,8 +12,22 @@ requireparser.add_argument('-t', '--tree', help='Newick formatted tree', require
 requireparser.add_argument('-m', '--map', help='Mapping file with metadata corresponding to samples. Must be tsv formatted', required=True)
 requireparser.add_argument('-c', '--category', help='Column category from mapping file to order/color samples by', required=True)
 parser.add_argument('-f', '--treeformat', help='Optional: set tree format type. Default is newick formatted tree.', default='newick')
+parser.add_argument('-r', '--remote', help='Set this option as True running on a remote cluster. Disables the automatic $DISPLAY environment varible used by matplotlib', type=bool)
 
 args = parser.parse_args()
+
+if args.remote is not None:
+	import matplotlib
+	matplotlib.use('Agg')
+
+import matplotlib.pyplot as plt
+import pandas as pd
+import networkx as nx
+import numpy as np
+import seaborn as sns
+import matplotlib.patches as mpatches
+from Bio import Phylo
+from itertools import repeat
 
 ##TO DO: AT SOME POINT, ADD ALIGNMENT AND DISTANCE MATRIX OPTIONS?
 
@@ -74,7 +80,7 @@ ordered = subset.reindex(leaves)
 
 ###GROUP DATA BY METADATA CATEGORY###
 #group samples by metadata category in mapping file
-grouped = metadat.groupby(args.category)['SampleID'].apply(list)
+grouped = metadat.groupby(args.category)['#SampleID'].apply(list)
 sampOrder = []
 for i in grouped:
 	sampOrder += i
