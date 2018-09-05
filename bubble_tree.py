@@ -61,7 +61,7 @@ Phylo.draw_ascii(tree)
 
 #plot the tree, save to pdf
 Phylo.draw(tree, do_show=False)
-plt.savefig("tree.pdf")
+plt.savefig('%s_tree.pdf' % args.category)
 
 #get order of leaves from tree
 leaves = []
@@ -112,7 +112,7 @@ ax.grid(True, linestyle="dotted")
 plt.legend(handles=legendGen)
 plt.xticks(rotation=90)
 #plt.show()
-plt.savefig("bubble.pdf")
+plt.savefig('%s_bubblePlot.pdf' % args.category)
 
 
 
