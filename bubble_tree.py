@@ -33,6 +33,26 @@ for leaf in tree.get_terminals():
 subset = biom.loc[biom['#OTU ID'].isin(leaves)].set_index('#OTU ID')
 ordered = subset.reindex(leaves)
 
+######NORMALIZE ACROSS ROWS
+#first get max and min value for each row and append to dataframe
+biom['rowmax'] = biom.max(axis=1)
+biom['rowmin'] = biom.min(axis=1)
+
+def norm(x,rmin,rmax):
+	xnorm = (x - rmin)/(rmax - rmin)
+	return xnorm
+
+normdf = pd.DataFrame()
+
+#save first column to append to norm dataframe
+samps = list(biom['#OTU ID'][1:])
+
+for i in range(1, len(biom)):
+	normdata = biom.iloc[i][1:-2].apply(norm, args=(biom['rowmin'][i], biom['rowmax'][i])).fillna(0)
+	normdf = normdf.append(normdata)
+
+normdf.insert(loc=0, column="#OTU ID", value=samps)
+
 #####EXTRA GROUPING/COLOR OPTIONS
 #group samples by metadata category in mapping file
 grouped = metadat.groupby('CatC')['SampleID'].apply(list)
