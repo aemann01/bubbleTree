@@ -2,7 +2,6 @@
 
 '''This script draws a sample abundance bubble chart ordered by the leaves on a phylogenetic tree. Samples are ordered and colored by a metadata category. Useage: python3 bubble_tree.py -b <biom.txt> -m <mapping.txt> -t <tree.newick> -c <category>'''
 
-
 import argparse
 parser = argparse.ArgumentParser()
 requireparser = parser.add_argument_group('required arguments')
@@ -31,6 +30,7 @@ from Bio import Phylo
 from itertools import repeat
 
 ##TO DO: AT SOME POINT, ADD ALIGNMENT AND DISTANCE MATRIX OPTIONS?
+##TO DO: TREE TIPS SHOULD ALIGN WITH TICKS ON BUBBLE PLOT, MAYBE MANUALLY DRAW TREE
 
 ###LOAD FILES###
 #load in tab separated biom table -- must have hashed out first row
@@ -111,8 +111,13 @@ for i in legendCol:
 	legendGen.append(mpatches.Patch(color=legendCol[j], label=legendName[j]))
 	j += 1
 
+gs = gridspec.GridSpec(1, 2, width_ratios=[1, 2]) 
+gs.update(wspace=0.05, hspace=2)
 treeax=plt.subplot(gs[0])
 bubbleax = plt.subplot(gs[1])
+
+Phylo.draw(tree, axes=treeax, do_show=False)
+
 
 plt.scatter(x=x.flatten(), y=y.flatten(), s=final.values.flatten(), zorder=3, c=col,edgecolors="black", axes=bubbleax)
 #flip y axis to match tree
@@ -121,9 +126,14 @@ ax.set_ylim(ax.get_ylim()[::-1])
 ax.grid(True, linestyle="dotted", linewidth=0.2)
 plt.legend(handles=legendGen)
 plt.xticks(rotation=90)
-Phylo.draw(tree, axes=treeax, do_show=False)
+bubbleax.set_yticklabels([])
+treeax.set_ylabel('')
+#box = ax.get_position()
+#ax.set_position([box.x0, box.y0, box.width/1.2 , box.height/1.2])
+
 plt.show()
 plt.savefig('%s_bubblePlot.pdf' % args.category, bbox_inches='tight')
+
 
 
 
