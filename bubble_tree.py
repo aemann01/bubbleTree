@@ -68,6 +68,7 @@ Phylo.draw_ascii(tree)
 #plot the tree, save to pdf
 Phylo.draw(tree, do_show=False)
 plt.savefig('%s_tree.pdf' % args.category)
+plt.close()
 
 #get order of leaves from tree
 leaves = []
@@ -80,18 +81,22 @@ ordered = subset.reindex(leaves)
 
 ###GROUP DATA BY METADATA CATEGORY###
 #group samples by metadata category in mapping file
+#first remove rows that are not in the biom file
+filtmeta = metadat[metadat['#SampleID'].isin(list(ordered.columns))]
 grouped = metadat.groupby(args.category)['#SampleID'].apply(list)
 sampOrder = []
 for i in grouped:
 	sampOrder += i
 final = ordered.reindex(columns=sampOrder)
+#remove samples if full column is na (i.e., the sample is not present in the biom file)
+final.dropna(axis=1, how='all', inplace=True)
 
 ###GENERATE CLEVELAND STYLE DOTPLOT AND PLOT###
 #flatten the matrix
 x,y = np.meshgrid(final.columns, final.index)
 
 #get color scheme based on grouping category
-colmap = sns.color_palette()
+colmap = sns.color_palette("Paired")
 
 col = []
 j = 0
@@ -101,7 +106,7 @@ for i in grouped:
 
 #get corresponding legend values (preserve order in color list)
 legendCol = sorted(set(col), key=lambda x: col.index(x)) 
-legendName = metadat[args.category].unique()
+legendName = list(filtmeta.groupby(args.category).groups.keys())
 
 #generate legend
 legendGen = []
@@ -114,10 +119,10 @@ plt.scatter(x=x.flatten(), y=y.flatten(), s=final.values.flatten(), zorder=3, c=
 #flip y axis to match tree
 ax = plt.gca()
 ax.set_ylim(ax.get_ylim()[::-1])
-ax.grid(True, linestyle="dotted")
+ax.grid(True, linestyle="dotted", linewidth=0.2)
 plt.legend(handles=legendGen)
 plt.xticks(rotation=90)
-#plt.show()
+plt.show()
 plt.savefig('%s_bubblePlot.pdf' % args.category)
 
 
