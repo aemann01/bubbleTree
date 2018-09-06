@@ -31,7 +31,11 @@ from Bio import Phylo
 from itertools import repeat
 
 ##TO DO: AT SOME POINT, ADD ALIGNMENT AND DISTANCE MATRIX OPTIONS?
-##TO DO: TREE TIPS SHOULD ALIGN WITH TICKS ON BUBBLE PLOT, MAYBE MANUALLY DRAW TREE
+##TO DO: DECREASE SIZE OF TEXT OF BUBBLE PLOT X AXIS
+##TO DO: DECREASE SIZE OF LEGEND
+##TO DO: REPLACE BUBBLE PLOT X AXIS LABELS WITH ORDERED LEAVES
+##TO DO: REMOVE BOX FROM AROUND TREE SUBFIGURE, NO Y TICKS OR LABELS
+##TO DO: SET DISTANCE BETWEEN TREE AND BUBBLE PLOT SO NO OVERLAP
 
 ###LOAD FILES###
 #load in tab separated biom table -- must have hashed out first row
@@ -82,8 +86,14 @@ ordered = subset.reindex(leaves)
 #group samples by metadata category in mapping file
 #first remove rows that are not in the biom file
 filtmeta = metadat[metadat['#SampleID'].isin(list(ordered.columns))]
-grouped = metadat.groupby(args.category)['#SampleID'].apply(list)
+grouped = filtmetadat.groupby(args.category)['#SampleID'].apply(list)
+
 sampOrder = []
+
+#sort rows by highest to lowest value 
+
+
+#if you want to group by the listed metadata categories
 for i in grouped:
 	sampOrder += i
 final = ordered.reindex(columns=sampOrder)
@@ -104,8 +114,7 @@ for i in grouped:
 	j += 1
 
 #get corresponding legend values (preserve order in color list)
-#legendCol = sorted(set(col), key=lambda x: col.index(x)) 
-legendCol = colmap[0:len(grouped)]
+legendCol = sorted(set(col), key=lambda x: col.index(x)) 
 legendName = list(filtmeta.groupby(args.category).groups.keys())
 
 #generate legend
@@ -116,7 +125,7 @@ for i in legendName:
 	j += 1
 
 gs = gridspec.GridSpec(1, 2, width_ratios=[1, 2]) 
-gs.update(wspace=0.05, hspace=2)
+gs.update(wspace=0.5, hspace=2)
 treeax=plt.subplot(gs[0])
 bubbleax = plt.subplot(gs[1])
 
@@ -137,13 +146,9 @@ treeax.set_ylabel('')
 
 plt.show()
 plt.savefig('%s_bubblePlot.pdf' % args.category, bbox_inches='tight')
-
-
-
-
-
-
-
+metadat.close()
+biom.close()
+tree.close()
 
 
 
