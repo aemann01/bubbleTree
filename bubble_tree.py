@@ -11,7 +11,8 @@ requireparser.add_argument('-t', '--tree', help='Newick formatted tree', require
 requireparser.add_argument('-m', '--map', help='Mapping file with metadata corresponding to samples. Must be tsv formatted', required=True)
 requireparser.add_argument('-c', '--category', help='Column category from mapping file to order/color samples by', required=True)
 parser.add_argument('-f', '--treeformat', help='Optional: set tree format type. Default is newick formatted tree.', default='newick')
-parser.add_argument('-r', '--remote', help='Set this option as True running on a remote cluster. Disables the automatic $DISPLAY environment varible used by matplotlib', type=bool)
+parser.add_argument('-r', '--remote', help='Set this option as True running on a remote cluster. Disables the automatic $DISPLAY environment varible used by matplotlib', type=bool, default='False')
+parser.add_argument('-p', '--previewtree', help='Set this option as True if you want to preview an ASCII version of the imported tree in the standard output', type=bool)
 
 args = parser.parse_args()
 
@@ -35,13 +36,14 @@ from itertools import repeat
 ###LOAD FILES###
 #load in tab separated biom table -- must have hashed out first row
 biom = pd.read_csv(args.biom, sep="\t", skiprows=1)
-print("Reading %s as tsv formatted biom file" % args.biom)
+print("Reading %s as tsv formatted biom file..." % args.biom)
 #load in newick format tree
 tree = Phylo.read(args.tree, args.treeformat)
-print("Reading %s as %s formatted tree file" % (args.tree, args.treeformat))
+print("Reading %s as %s formatted tree file..." % (args.tree, args.treeformat))
 #load in mapping file
 metadat = pd.read_csv(args.map, sep="\t")
-print("Reading in %s as mapping file\n" % args.map)
+print("Reading in %s as mapping file...\n" % args.map)
+print("Generating figure for %s metadata category..." % args.category)
 
 ###NORMALIZE COUNTS IN BIOM TABLE###
 #first get max and min value for each row and append to dataframe
@@ -63,8 +65,9 @@ normdf.insert(loc=0, column="#OTU ID", value=samps)
 
 ###REORDER NORMALIZED BIOM TABLE BY BRANCH ORDER###
 #preview tree topology
-print("Tree preview:\n")
-Phylo.draw_ascii(tree)
+if args.previewtree is not None:
+	print("Tree preview:\n")
+	Phylo.draw_ascii(tree)
 
 #get order of leaves from tree
 leaves = []
@@ -92,7 +95,7 @@ final.dropna(axis=1, how='all', inplace=True)
 x,y = np.meshgrid(final.columns, final.index)
 
 #get color scheme based on grouping category
-colmap = sns.color_palette("Paired")
+colmap = sns.color_palette("Paired") + sns.color_palette("dark") + sns.color_palette("Set2")
 
 col = []
 j = 0
@@ -101,13 +104,14 @@ for i in grouped:
 	j += 1
 
 #get corresponding legend values (preserve order in color list)
-legendCol = sorted(set(col), key=lambda x: col.index(x)) 
+#legendCol = sorted(set(col), key=lambda x: col.index(x)) 
+legendCol = colmap[0:len(grouped)]
 legendName = list(filtmeta.groupby(args.category).groups.keys())
 
 #generate legend
 legendGen = []
 j = 0
-for i in legendCol:
+for i in legendName:
 	legendGen.append(mpatches.Patch(color=legendCol[j], label=legendName[j]))
 	j += 1
 
