@@ -21,6 +21,7 @@ if args.remote is not None:
 	matplotlib.use('Agg')
 
 import matplotlib.pyplot as plt
+import matplotlib.gridspec as gridspec
 import pandas as pd
 import networkx as nx
 import numpy as np
@@ -64,11 +65,6 @@ normdf.insert(loc=0, column="#OTU ID", value=samps)
 #preview tree topology
 print("Tree preview:\n")
 Phylo.draw_ascii(tree)
-
-#plot the tree, save to pdf
-Phylo.draw(tree, do_show=False)
-plt.savefig('%s_tree.pdf' % args.category)
-plt.close()
 
 #get order of leaves from tree
 leaves = []
@@ -115,15 +111,19 @@ for i in legendCol:
 	legendGen.append(mpatches.Patch(color=legendCol[j], label=legendName[j]))
 	j += 1
 
-plt.scatter(x=x.flatten(), y=y.flatten(), s=final.values.flatten(), zorder=3, c=col,edgecolors="black")
+treeax=plt.subplot(gs[0])
+bubbleax = plt.subplot(gs[1])
+
+plt.scatter(x=x.flatten(), y=y.flatten(), s=final.values.flatten(), zorder=3, c=col,edgecolors="black", axes=bubbleax)
 #flip y axis to match tree
 ax = plt.gca()
 ax.set_ylim(ax.get_ylim()[::-1])
 ax.grid(True, linestyle="dotted", linewidth=0.2)
 plt.legend(handles=legendGen)
 plt.xticks(rotation=90)
+Phylo.draw(tree, axes=treeax, do_show=False)
 plt.show()
-plt.savefig('%s_bubblePlot.pdf' % args.category)
+plt.savefig('%s_bubblePlot.pdf' % args.category, bbox_inches='tight')
 
 
 
