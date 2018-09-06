@@ -31,10 +31,6 @@ from Bio import Phylo
 from itertools import repeat
 
 ##TO DO: AT SOME POINT, ADD ALIGNMENT AND DISTANCE MATRIX OPTIONS?
-##TO DO: DECREASE SIZE OF TEXT OF BUBBLE PLOT X AXIS
-##TO DO: DECREASE SIZE OF LEGEND
-##TO DO: REPLACE BUBBLE PLOT X AXIS LABELS WITH ORDERED LEAVES
-##TO DO: REMOVE BOX FROM AROUND TREE SUBFIGURE, NO Y TICKS OR LABELS
 ##TO DO: SET DISTANCE BETWEEN TREE AND BUBBLE PLOT SO NO OVERLAP
 
 ###LOAD FILES###
@@ -124,27 +120,26 @@ for i in legendName:
 	legendGen.append(mpatches.Patch(color=legendCol[j], label=legendName[j]))
 	j += 1
 
-gs = gridspec.GridSpec(1, 2, width_ratios=[1, 2]) 
+gs = gridspec.GridSpec(1, 2, width_ratios=[1, 3]) 
 gs.update(wspace=0.5, hspace=2)
-treeax=plt.subplot(gs[0])
+treeax=plt.subplot(gs[0], frame_on=False)
 bubbleax = plt.subplot(gs[1])
 
 Phylo.draw(tree, axes=treeax, do_show=False)
 
-
 plt.scatter(x=x.flatten(), y=y.flatten(), s=final.values.flatten(), zorder=3, c=col,edgecolors="black", axes=bubbleax)
-#flip y axis to match tree
 ax = plt.gca()
-ax.set_ylim(ax.get_ylim()[::-1])
+ax.set_ylim(ax.get_ylim()[::-1]) #flip y axis to match tree
 ax.grid(True, linestyle="dotted", linewidth=0.2)
-plt.legend(handles=legendGen)
+plt.legend(handles=legendGen, prop={'size': 6}) 
 plt.xticks(rotation=90)
-bubbleax.set_yticklabels([])
+ax.tick_params(axis = 'both', which = 'major', labelsize = 7.5)
 treeax.set_ylabel('')
-#box = ax.get_position()
-#ax.set_position([box.x0, box.y0, box.width/1.2 , box.height/1.2])
+treeax.set_xlabel('')
+treeax.set_xticks([])
+treeax.set_yticks([])
 
-plt.show()
+plt.show() #turn on for testing only
 plt.savefig('%s_bubblePlot.pdf' % args.category, bbox_inches='tight')
 metadat.close()
 biom.close()
