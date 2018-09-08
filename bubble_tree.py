@@ -1,6 +1,12 @@
 #!/usr/bin/env python3
 
-'''This script draws a normalized sample abundance heatmap or bubble chart ordered by the leaves on a phylogenetic tree. Samples are ordered and colored by a metadata category. Useage: python3 bubble_tree.py -b <biom.txt> -m <mapping.txt> -t <tree.newick> -c <category>'''
+'''This script draws a normalized sample abundance heatmap or bubble chart ordered by the leaves on a phylogenetic tree. 
+Samples are ordered and colored by a metadata category. Normalized across the row from 0 to 1. 
+Useage: python3 bubble_tree.py -i biom.txt -m mapping.txt -t tree.newick -c category -d [heatmap|bubblechart] <-r False -p False>'''
+
+##TO DO: ADD OPTIONS FOR DIFFERENT TREE FORMATS
+##TO DO: ALIGN TIP NAMES WITH DOTTED LINES NATIVELY
+##TO DO: INLCUDE NATIVE ALIGNMENT/DISTANCE MATRIX BUILD?
 
 import argparse
 parser = argparse.ArgumentParser()
@@ -18,17 +24,17 @@ parser.add_argument('-p', '--previewtree', help='Set this option as True if you 
 
 args = parser.parse_args()
 
-if args.remote is not None:
+if args.remote is not None: 
 	import matplotlib
 	matplotlib.use('Agg')
 
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
+import matplotlib.patches as mpatches
 import pandas as pd
 import networkx as nx
 import numpy as np
 import seaborn as sns
-import matplotlib.patches as mpatches
 import os
 from Bio import Phylo
 from itertools import repeat
@@ -60,7 +66,6 @@ def gennormbubble():
 	normdf.insert(loc=0, column="#OTU ID", value=samps)
 	reorderbiom(normdf)
 
-
 def gennormheat():
 	biom['rowmax'] = biom.max(axis=1) #first get max and min value for each row and append to dataframe
 	biom['rowmin'] = biom.min(axis=1)
@@ -71,7 +76,6 @@ def gennormheat():
 		normdf = normdf.append(normdata)
 	normdf.insert(loc=0, column="#OTU ID", value=samps)
 	reorderbiom(normdf)
-
 
 def reorderbiom(normdf):
 	leaves = [] #get order of leaves from tree
@@ -90,11 +94,11 @@ def reorderbiom(normdf):
 	if args.display == 'heatmap':
 		heat(final)
 	elif args.display == 'bubblechart':
-		bubble(final)
+		bubble(final, grouped, filtmeta)
 
-def bubble(final):
+def bubble(final, grouped, filtmeta):
 	x,y = np.meshgrid(final.columns, final.index) #flatten the matrix
-	colmap = sns.color_palette("Paired") + sns.color_palette("dark") + sns.color_palette("Set2") #get color scheme based on grouping category
+	colmap = sns.color_palette("Set2") + sns.color_palette("Paired") + sns.color_palette("dark") #get color scheme based on grouping category (can do up to 30 categories, add more palettes for more)
 	col = []
 	j = 0
 	for i in grouped:
@@ -108,50 +112,57 @@ def bubble(final):
 		legendGen.append(mpatches.Patch(color=legendCol[j], label=legendName[j]))
 		j += 1
 	#set up subplot aesthetics
-	gs = gridspec.GridSpec(1, 2, width_ratios=[1, 3]) 
-	gs.update(wspace=0.5, hspace=2)
+	gs = gridspec.GridSpec(1, 2, width_ratios=[0.5, 3]) 
+	gs.update(wspace=0.25, hspace=2)
 	treeax=plt.subplot(gs[0], frame_on=False)
 	bubbleax = plt.subplot(gs[1])
+	plt.rc('font', size=-0)
+	
+	Phylo.draw(tree, axes=treeax, do_show=False)
+	plt.scatter(x=x.flatten(), y=y.flatten(), s=final.values.flatten(), zorder=3, c=col,edgecolors="black", axes=bubbleax)
+
+
 	ax = plt.gca()
 	ax.set_ylim(ax.get_ylim()[::-1]) #flip y axis to match tree
 	ax.grid(True, linestyle="dotted", linewidth=0.2)
 	plt.legend(handles=legendGen, prop={'size': 6}) 
 	plt.xticks(rotation=90)
-	ax.tick_params(axis = 'both', which = 'major', labelsize = 7.5)
+	ax.tick_params(axis = 'both', which = 'major', labelsize = 5)
 	treeax.set_ylabel('')
 	treeax.set_xlabel('')
 	treeax.set_xticks([])
 	treeax.set_yticks([])
-	#plot
-	Phylo.draw(tree, axes=treeax, do_show=False)
-	plt.scatter(x=x.flatten(), y=y.flatten(), s=final.values.flatten(), zorder=3, c=col,edgecolors="black", axes=bubbleax)
 	#save
 	#plt.show() #turn on for testing only
 	plt.savefig('%s_bubblePlot.pdf' % args.category, bbox_inches='tight')
 
-
+##TO DO: MAKE THIS PRETTY SON
 def heat(final):
 		#set up plot aesthetics
-	gs = gridspec.GridSpec(1, 2, width_ratios=[1, 3]) 
+	gs = gridspec.GridSpec(1, 2, width_ratios=[1, 5]) 
 	gs.update(wspace=0.5, hspace=2)
 	treeax=plt.subplot(gs[0], frame_on=False)
 	bubbleax = plt.subplot(gs[1])
 	ax = plt.gca()
 	ax.set_ylim(ax.get_ylim()[::-1]) #flip y axis to match tree
+	ax.tick_params(axis = 'both', which = 'major', labelsize = 5)
+	bubbleax.set_ylabel('')
 	treeax.set_ylabel('')
 	treeax.set_xlabel('')
 	treeax.set_xticks([])
 	treeax.set_yticks([])
 	#plot
+	plt.rc('font', size=-0)
 	Phylo.draw(tree, axes=treeax, do_show=False)
-	sns.heatmap(final, square=True, mask=False)
+	sns.heatmap(final, mask=False)
 	#save
 	#plt.show() #turn on for testing only
 	plt.savefig('%s_heatPlot.pdf' % args.category, bbox_inches='tight')
 
-
 def main():
 	assert os.path.exists(args.input), 'Error! File does not exist: %s. Is the path correct?' % args.input
+	assert os.path.exists(args.tree), 'Error! File does not exist: %s. Is the path correct?' % args.tree
+	assert os.path.exists(args.map), 'Error! File does not exist: %s. Is the path correct?' % args.map
 	#preview tree topology?
 	if args.previewtree is not None:
 		print("Tree preview:\n")
