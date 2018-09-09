@@ -116,8 +116,8 @@ def bubble(final, grouped, filtmeta):
 	gs.update(wspace=0.25, hspace=2)
 	treeax=plt.subplot(gs[0], frame_on=False)
 	bubbleax = plt.subplot(gs[1])
-	plt.rc('font', size=-0)
-	
+	plt.rc('font', size=0)
+
 	Phylo.draw(tree, axes=treeax, do_show=False)
 	plt.scatter(x=x.flatten(), y=y.flatten(), s=final.values.flatten(), zorder=3, c=col,edgecolors="black", axes=bubbleax)
 
@@ -139,22 +139,23 @@ def bubble(final, grouped, filtmeta):
 ##TO DO: MAKE THIS PRETTY SON
 def heat(final):
 		#set up plot aesthetics
-	gs = gridspec.GridSpec(1, 2, width_ratios=[1, 5]) 
-	gs.update(wspace=0.5, hspace=2)
+	gs = gridspec.GridSpec(1, 2, width_ratios=[0.5, 3]) 
+	gs.update(wspace=0.25, hspace=2)
 	treeax=plt.subplot(gs[0], frame_on=False)
 	bubbleax = plt.subplot(gs[1])
 	ax = plt.gca()
 	ax.set_ylim(ax.get_ylim()[::-1]) #flip y axis to match tree
 	ax.tick_params(axis = 'both', which = 'major', labelsize = 5)
 	bubbleax.set_ylabel('')
+	#plot
+	plt.rc('font', size=-0)
 	treeax.set_ylabel('')
 	treeax.set_xlabel('')
 	treeax.set_xticks([])
 	treeax.set_yticks([])
-	#plot
-	plt.rc('font', size=-0)
 	Phylo.draw(tree, axes=treeax, do_show=False)
-	sns.heatmap(final, mask=False)
+	sns.set(font_scale=1)
+	sns.heatmap(final, mask=False, cmap="YlGnBu")
 	#save
 	#plt.show() #turn on for testing only
 	plt.savefig('%s_heatPlot.pdf' % args.category, bbox_inches='tight')
