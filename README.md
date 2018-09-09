@@ -29,3 +29,8 @@ Generate a bubble chart figure colored and ordered by the mapping.txt column Gen
 ```
 bubble_tree.py -i biom.txt -t tree.tre -m map.txt -c Genus -d bubble -r True
 ```
+
+Help and parameter description
+```
+bubble_tree.py -h
+```
