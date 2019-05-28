@@ -2,6 +2,8 @@
 
 ![example](img/figexample.png)
 
+NOTE: Under construction!!
+
 Bubble tree takes a tab separated frequency table (e.g., a biom table with taxa as rows and samples as columns), a newick, nexus, nexml, phyloxml, or cdao formatted phylogenetic tree, and a tab separated file with sample metadata to create either a Cleveland dot plot--style or heatmap and tree.
 
 ### Prerequisites
