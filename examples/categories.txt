@@ -1,6 +1,0 @@
-Country
-Diet
-Genus
-Habitat2
-Phyl_Group
-Species
