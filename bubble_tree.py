@@ -4,6 +4,11 @@
 Samples are ordered and colored by a metadata category. Normalized across the row from 0 to 1. 
 Useage: python3 bubble_tree.py -i biom.txt -m mapping.txt -t tree.newick -c category -d [heatmap|bubblechart] <-r False -p False>'''
 
+##TO DO: OPTION TO ORDER X AXIS BY ANOTHER TREE
+##TO DO: ADD OPTIONS FOR DIFFERENT TREE FORMATS
+##TO DO: ALIGN TIP NAMES WITH DOTTED LINES NATIVELY
+##TO DO: INLCUDE NATIVE ALIGNMENT/DISTANCE MATRIX BUILD?
+
 import argparse
 parser = argparse.ArgumentParser()
 requireparser = parser.add_argument_group('required arguments')
@@ -12,7 +17,7 @@ requireparser.add_argument('-i', '--input', help='Absolute abundance biom table.
 requireparser.add_argument('-t', '--tree', help='Newick formatted tree', required=True)
 requireparser.add_argument('-m', '--map', help='Mapping file with metadata corresponding to samples. Must be tsv formatted', required=True)
 requireparser.add_argument('-c', '--category', help='Column category from mapping file to order/color samples by', required=True)
-requireparser.add_argument('-d', '--display', help='Display data as a heatmap or bubble', default="bubble")
+requireparser.add_argument('-d', '--display', help='Display data as a heatmap or bubblechart', default="bubblechart")
 requireparser.add_argument('-n', '--norm', help='Normalization setting, can be log, row, or none', default="row")
 
 parser.add_argument('-f', '--treeformat', help='Optional: set tree format type. Default is newick formatted tree.', default='newick')
@@ -178,7 +183,7 @@ def main():
 	#heatmap or bubble plot?
 	if args.display == "heatmap":
 		gennormheat()
-	elif args.display == "bubble":
+	elif args.display == "bubblechart":
 		gennormbubble()
 
 main()
