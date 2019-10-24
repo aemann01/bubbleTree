@@ -2,7 +2,7 @@
 
 '''This script draws a normalized sample abundance heatmap or bubble chart ordered by the leaves on a phylogenetic tree. 
 Samples are ordered and colored by a metadata category. Normalized across the row (single tree tip) from 0 to 1. 
-Useage: python3 bubble_tree.py -i biom.txt -m mapping.txt -t tree.newick -c category -d <heatmap|bubblechart> <-r False> <-p False>'''
+Useage: python3 bubble_tree.py -i biom.txt -m mapping.txt -t tree.newick -c category -d <bubblechart> <-r False> <-p False> <-n row>'''
 
 import argparse
 parser = argparse.ArgumentParser()
