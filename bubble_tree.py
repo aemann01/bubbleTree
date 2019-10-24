@@ -15,6 +15,7 @@ requireparser.add_argument('-d', '--display', help='Display data as a heatmap or
 parser.add_argument('-f', '--treeformat', help='Optional: set tree format type. Default is newick formatted tree.', default='newick')
 parser.add_argument('-r', '--remote', help='Set this option as True running on a remote cluster. Disables the automatic $DISPLAY environment varible used by matplotlib', type=bool, default='False')
 parser.add_argument('-p', '--previewtree', help='Set this option as True if you want to preview an ASCII version of the imported tree', type=bool)
+parser.add_argument('-n', '--norm', help='Normalize read counts by row (0-1) or log transformation', default='row')
 args = parser.parse_args()
 
 if args.remote is not None: 
@@ -57,11 +58,10 @@ def gennormbubble():
 			normdf = normdf.append(normdata)
 		normdf.insert(loc=0, column='#OTU ID', value=samps)	
 	elif args.norm == "log":
-		normlist = []
 		for i in range(1, len(biom)):
-			normlist.append(np.log(i))
-			normdf = pd.DataFrame({'#OTU ID': samps, 'value': normlist})
-		print(normdf)
+			normdata = np.log10(biom.iloc[i][1:-2].astype(np.float64))
+			normdf = normdf.append(normdata)
+		normdf.insert(loc=0, column='#OTU ID', value=samps)
 	reorderbiom(normdf)
 
 def gennormheat():
@@ -69,10 +69,16 @@ def gennormheat():
 	biom['rowmin'] = biom.min(axis=1)
 	normdf = pd.DataFrame()
 	samps = list(biom['#OTU ID'][1:]) #save first column to append to norm dataframe
-	for i in range(1, len(biom)):
-		normdata = biom.iloc[i][1:-2].apply(rownormheat, args=(biom['rowmin'][i], biom['rowmax'][i])).fillna(0)
-		normdf = normdf.append(normdata)
-	normdf.insert(loc=0, column="#OTU ID", value=samps)
+	if args.norm == "row":
+		for i in range(1, len(biom)):
+			normdata = biom.iloc[i][1:-2].apply(rownormbubble, args=(biom['rowmin'][i], biom['rowmax'][i])).fillna(0)
+			normdf = normdf.append(normdata)
+		normdf.insert(loc=0, column='#OTU ID', value=samps)	
+	elif args.norm == "log":
+		for i in range(1, len(biom)):
+			normdata = np.log10(biom.iloc[i][1:-2].astype(np.float64))
+			normdf = normdf.append(normdata)
+		normdf.insert(loc=0, column='#OTU ID', value=samps)
 	reorderbiom(normdf)
 
 def reorderbiom(normdf):
