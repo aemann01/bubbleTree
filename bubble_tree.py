@@ -16,6 +16,8 @@ parser.add_argument('-f', '--treeformat', help='Optional: set tree format type. 
 parser.add_argument('-r', '--remote', help='Set this option as True running on a remote cluster. Disables the automatic $DISPLAY environment varible used by matplotlib', type=bool, default='False')
 parser.add_argument('-p', '--previewtree', help='Set this option as True if you want to preview an ASCII version of the imported tree', type=bool)
 parser.add_argument('-n', '--norm', help='Normalize read counts by row (0-1) or log transformation', default='row')
+##TODO: Root tree function
+#parser.add_argument('-o', '--outgroup', help='Root tree either at midpoint or with named outgroup', default='Null')
 args = parser.parse_args()
 
 if args.remote is not None: 
@@ -160,7 +162,7 @@ def main():
 	assert os.path.exists(args.tree), 'Error! File does not exist: %s. Is the path correct?' % args.tree
 	assert os.path.exists(args.map), 'Error! File does not exist: %s. Is the path correct?' % args.map
 	if args.previewtree is not None: #preview tree topology?
-		print("Tree preview:\n")
+		print("Raw tree preview:\n")
 		Phylo.draw_ascii(tree)
 	if args.display == "heatmap": #heatmap or bubble plot?
 		gennormheat()
