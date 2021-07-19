@@ -1,5 +1,7 @@
 # Bubble Tree
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5114948.svg)](https://doi.org/10.5281/zenodo.5114948)
+
 ![example](img/figexample.png)
 
 Bubble tree takes a tab separated frequency table (e.g., a biom table with taxa as rows and samples as columns), a newick, nexus, nexml, phyloxml, or cdao formatted phylogenetic tree, and a tab separated file with sample metadata to create either a Cleveland dot plot--style or heatmap and tree. See example files for formatting requirements.
