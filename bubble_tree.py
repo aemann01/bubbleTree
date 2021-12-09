@@ -2,7 +2,7 @@
 
 '''This script draws a normalized sample abundance heatmap or bubble chart ordered by the leaves on a phylogenetic tree. 
 Samples are ordered and colored by a metadata category. Normalized across the row (single tree tip) from 0 to 1. 
-Useage: python3 bubble_tree.py -i biom.txt -m mapping.txt -t tree.newick -c category -d <bubblechart> <-r False> <-p False> <-n row>'''
+Useage: python3 bubble_tree.py -i biom.txt -m mapping.txt -t tree.newick -c category -a asvid -s sampleid -d <bubblechart> <-r False> <-p False> <-n row>'''
 
 import argparse
 parser = argparse.ArgumentParser()
@@ -11,7 +11,9 @@ requireparser.add_argument('-i', '--input', help='Frequency table. Must be tsv f
 requireparser.add_argument('-t', '--tree', help='Phylogenetic tree', required=True)
 requireparser.add_argument('-m', '--map', help='Mapping file with metadata corresponding to samples. Must be tsv formatted', required=True)
 requireparser.add_argument('-c', '--category', help='Column category from mapping file to order/color samples by', required=True)
-requireparser.add_argument('-d', '--display', help='Display data as a heatmap or bubblechart', default="bubblechart")
+requireparser.add_argument('-a', '--asvids', help='Column name in biom table that contains ASV (or OTU or whatever) ids', required=True)
+requireparser.add_argument('-s', '--sampleids', help='Column name in mapping file that contains sample IDs', required=True)
+parser.add_argument('-d', '--display', help='Display data as a heatmap or bubblechart', default="bubblechart")
 parser.add_argument('-f', '--treeformat', help='Optional: set tree format type. Default is newick formatted tree.', default='newick')
 parser.add_argument('-r', '--remote', help='Set this option as True running on a remote cluster. Disables the automatic $DISPLAY environment varible used by matplotlib', type=bool, default='False')
 parser.add_argument('-p', '--previewtree', help='Set this option as True if you want to preview an ASCII version of the imported tree', type=bool)
@@ -33,7 +35,7 @@ import os
 from Bio import Phylo
 from itertools import repeat
 
-biom = pd.read_csv(args.input, sep="\t", skiprows=1) #load in tab separated biom table -- must have hashed out first row
+biom = pd.read_csv(args.input, sep="\t") #load in tab separated biom table 
 print("Reading %s as tsv formatted biom file..." % args.input)
 tree = Phylo.read(args.tree, args.treeformat) #load in tree
 print("Reading %s as %s formatted tree file..." % (args.tree, args.treeformat))
@@ -50,47 +52,48 @@ def rownormheat(x,rmin,rmax):
 	return xnorm
 
 def gennormbubble():
-	biom['rowmax'] = biom.max(axis=1) #first get max and min value for each row and append to dataframe
-	biom['rowmin'] = biom.min(axis=1)
+	biom['rowmax'] = biom.iloc[:, 1:len(biom.columns)].max(axis=1) #first get max and min value for each row and append to dataframe
+	biom['rowmin'] = biom.iloc[:, 1:len(biom.columns)].min(axis=1)
+	print(biom)
 	normdf = pd.DataFrame()
-	samps = list(biom['#OTU ID'][1:]) #save first column to append to norm dataframe
+	samps = list(biom[args.asvids][1:]) #save first column to append to norm dataframe
 	if args.norm == "row":
 		for i in range(1, len(biom)):
 			normdata = biom.iloc[i][1:-2].apply(rownormbubble, args=(biom['rowmin'][i], biom['rowmax'][i])).fillna(0)
 			normdf = normdf.append(normdata)
-		normdf.insert(loc=0, column='#OTU ID', value=samps)	
+		normdf.insert(loc=0, column=args.asvids, value=samps)	
 	elif args.norm == "log":
 		for i in range(1, len(biom)):
 			normdata = np.log10(biom.iloc[i][1:-2].astype(np.float64))
 			normdf = normdf.append(normdata)
-		normdf.insert(loc=0, column='#OTU ID', value=samps)
+		normdf.insert(loc=0, column=args.asvids, value=samps)
 	reorderbiom(normdf)
 
 def gennormheat():
-	biom['rowmax'] = biom.max(axis=1) #first get max and min value for each row and append to dataframe
-	biom['rowmin'] = biom.min(axis=1)
+	biom['rowmax'] = biom.iloc[:, 1:len(biom.columns)].max(axis=1) #first get max and min value for each row and append to dataframe
+	biom['rowmin'] = biom.iloc[:, 1:len(biom.columns)].min(axis=1)
 	normdf = pd.DataFrame()
-	samps = list(biom['#OTU ID'][1:]) #save first column to append to norm dataframe
+	samps = list(biom[args.asvids][1:]) #save first column to append to norm dataframe
 	if args.norm == "row":
 		for i in range(1, len(biom)):
 			normdata = biom.iloc[i][1:-2].apply(rownormbubble, args=(biom['rowmin'][i], biom['rowmax'][i])).fillna(0)
 			normdf = normdf.append(normdata)
-		normdf.insert(loc=0, column='#OTU ID', value=samps)	
+		normdf.insert(loc=0, column=args.asvids, value=samps)	
 	elif args.norm == "log":
 		for i in range(1, len(biom)):
 			normdata = np.log10(biom.iloc[i][1:-2].astype(np.float64))
 			normdf = normdf.append(normdata)
-		normdf.insert(loc=0, column='#OTU ID', value=samps)
+		normdf.insert(loc=0, column=args.asvids, value=samps)
 	reorderbiom(normdf)
 
 def reorderbiom(normdf):
 	leaves = [] #get order of leaves from tree
 	for leaf in tree.get_terminals():
 		leaves.append(leaf.name)
-	subset = normdf.loc[normdf['#OTU ID'].isin(leaves)].set_index('#OTU ID') #pull nodes from biom and reorder by leaves in tree
+	subset = normdf.loc[normdf[args.asvids].isin(leaves)].set_index(args.asvids) #pull nodes from biom and reorder by leaves in tree
 	ordered = subset.reindex(leaves)
-	filtmeta = metadat[metadat['#SampleID'].isin(list(ordered.columns))] #first remove rows that are not in the biom file
-	grouped = filtmeta.groupby(args.category)['#SampleID'].apply(list) #group samples by metadata category
+	filtmeta = metadat[metadat[args.sampleids].isin(list(ordered.columns))] #first remove rows that are not in the biom file
+	grouped = filtmeta.groupby(args.category)[args.sampleids].apply(list) #group samples by metadata category
 	sampOrder = []
 	for i in grouped:
 		sampOrder += i
@@ -175,3 +178,4 @@ __author__ = "Allison E. Mann"
 __license__ = "GPL"
 __version__ = "1.0.1"
 __email__="allison.e.mann@gmail.com"
+
