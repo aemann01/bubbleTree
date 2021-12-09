@@ -19,17 +19,17 @@ Bubble tree is written with python 3+ and relies on the following packages:
 ### Examples
 Generate a heatmap figure ordered by the mapping.txt column Habitat2
 ```
-bubble_tree.py -i exampes/biom.txt -t examples/tree.tre -m examples/map.txt -c Habitat2 -d heatmap
+bubble_tree.py -i exampes/biom.txt -t examples/tree.tre -m examples/map.txt -c Habitat2 -d heatmap -s sampleID -a ASVID
 ```
 
 Generate a bubble chart figure colored and ordered by the mapping.txt column Species and view the tree structure in ASCII format to screen
 ```
-bubble_tree.py -i examples/biom.txt -t examples/tree.tre -m examples/map.txt -c Species -d bubblechart -p True
+bubble_tree.py -i examples/biom.txt -t examples/tree.tre -m examples/map.txt -c Species -d bubblechart -p True -s sampleID -a ASVID
 ```
 
 Generate a bubble chart figure colored and ordered by the mapping.txt column Genus on a remote cluster (Disables the automatic $DISPLAY environment varible used by matplotlib)
 ```
-bubble_tree.py -i examples/biom.txt -t examples/tree.tre -m examples/map.txt -c Genus -d bubblechart -r True
+bubble_tree.py -i examples/biom.txt -t examples/tree.tre -m examples/map.txt -c Genus -d bubblechart -r True -s sampleID -a ASVID
 ```
 
 Help and parameter description
