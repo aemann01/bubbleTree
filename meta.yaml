@@ -1,0 +1,28 @@
+package:
+  name: "bubbleTree"
+  version: "1.2.0"
+
+source:
+  git_rev: 
+  git_url: https://github.com/aemann01/bubbleTree
+
+requirements:
+  host:
+    - python
+  build:
+    - python
+  run:
+    - python
+    - pandas
+    - biopython
+    - numpy
+    - matplotlib
+    - argparse
+    - seaborn
+
+about:
+  home: https://github.com/aemann01/bubbleTree
+  license: GNU
+  license_family: GNU
+  license_file: LICENSE
+  summary: "Plot a phylogenetic tree against a bubble plot or heatmap"
