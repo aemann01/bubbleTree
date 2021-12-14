@@ -16,6 +16,12 @@ Bubble tree is written with python 3+ and relies on the following packages:
 * [Numpy](http://www.numpy.org/)
 * [Seaborn](https://seaborn.pydata.org/)
 
+### Install with pip
+
+```
+pip install bubbletree
+```
+
 ### Install with conda
 
 ```
