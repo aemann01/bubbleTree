@@ -4,7 +4,7 @@
 
 ![example](img/figexample.png)
 
-Bubble tree takes a tab separated frequency table (e.g., a biom table with taxa as rows and samples as columns), a newick, nexus, nexml, phyloxml, or cdao formatted phylogenetic tree, and a tab separated file with sample metadata to create either a Cleveland dot plot--style or heatmap and tree. See example files for formatting requirements.
+BubbleTree generates a Cleveland dot plot or heatmap ordered by a corresponding phylogenetic tree. Required input: a tab separated frequency table (i.e., with taxa as rows and samples as columns), a newick, nexus, nexml, phyloxml, or cdao formated tree, and a tab separated file with sample metdata. See example files for formatting requirements.
 
 ### Prerequisites
 
@@ -15,6 +15,12 @@ Bubble tree is written with python 3+ and relies on the following packages:
 * [Pandas](https://pandas.pydata.org/)
 * [Numpy](http://www.numpy.org/)
 * [Seaborn](https://seaborn.pydata.org/)
+
+### Install with conda
+
+```
+conda install -c aemann01 bubbletree
+```
 
 ### Examples
 Generate a heatmap figure ordered by the mapping.txt column Habitat2
