@@ -1,0 +1,55 @@
+Metadata-Version: 2.1
+Name: bubbletree
+Version: 1.1
+Summary: Bubble plot or heatmap ordered by phylogenetic tree
+Home-page: https://github.com/aemann01/bubbleTree
+Author: Allison E. Mann
+Author-email: amann3@clemson.edu
+License: UNKNOWN
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: GNU General Public License (GPL)
+Classifier: Operating System :: OS Independent
+Description-Content-Type: text/markdown
+License-File: LICENSE
+
+# Bubble Tree
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5114948.svg)](https://doi.org/10.5281/zenodo.5114948)
+
+![example](img/figexample.png)
+
+Bubble tree takes a tab separated frequency table (e.g., a biom table with taxa as rows and samples as columns), a newick, nexus, nexml, phyloxml, or cdao formatted phylogenetic tree, and a tab separated file with sample metadata to create either a Cleveland dot plot--style or heatmap and tree. See example files for formatting requirements.
+
+### Prerequisites
+
+Bubble tree is written with python 3+ and relies on the following packages:
+
+* [BioPython](https://biopython.org/) 
+* [Matplotlib](https://matplotlib.org/)
+* [Pandas](https://pandas.pydata.org/)
+* [Numpy](http://www.numpy.org/)
+* [Seaborn](https://seaborn.pydata.org/)
+
+### Examples
+Generate a heatmap figure ordered by the mapping.txt column Habitat2
+```
+bubble_tree.py -i exampes/biom.txt -t examples/tree.tre -m examples/map.txt -c Habitat2 -d heatmap -s sampleID -a ASVID
+```
+
+Generate a bubble chart figure colored and ordered by the mapping.txt column Species and view the tree structure in ASCII format to screen
+```
+bubble_tree.py -i examples/biom.txt -t examples/tree.tre -m examples/map.txt -c Species -d bubblechart -p True -s sampleID -a ASVID
+```
+
+Generate a bubble chart figure colored and ordered by the mapping.txt column Genus on a remote cluster (Disables the automatic $DISPLAY environment varible used by matplotlib)
+```
+bubble_tree.py -i examples/biom.txt -t examples/tree.tre -m examples/map.txt -c Genus -d bubblechart -r True -s sampleID -a ASVID
+```
+
+Help and parameter description
+```
+bubble_tree.py -h
+```
+
+
