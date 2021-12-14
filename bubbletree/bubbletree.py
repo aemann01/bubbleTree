@@ -54,7 +54,7 @@ def rownormheat(x,rmin,rmax):
 def gennormbubble():
 	biom['rowmax'] = biom.iloc[:, 1:len(biom.columns)].max(axis=1) #first get max and min value for each row and append to dataframe
 	biom['rowmin'] = biom.iloc[:, 1:len(biom.columns)].min(axis=1)
-	print(biom)
+	# print(biom) # for debugging
 	normdf = pd.DataFrame()
 	samps = list(biom[args.asvids][1:]) #save first column to append to norm dataframe
 	if args.norm == "row":

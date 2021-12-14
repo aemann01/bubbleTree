@@ -1,4 +1,4 @@
-SampleID	Genus	Species	Diet	Country	Habitat2
+sampleID	Genus	Species	Diet	Country	Habitat2
 JB29	Theropithecus	gelada	Folivore	Ethiopia	Savannah
 JB27	Theropithecus	gelada	Folivore	Ethiopia	Savannah
 ERUB104M	Eulemur	rubriventer	Not	Madagascar	Rainforest
