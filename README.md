@@ -1,6 +1,8 @@
 # Bubble Tree
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5114948.svg)](https://doi.org/10.5281/zenodo.5114948)
+[![Anaconda-Server Badge](https://anaconda.org/aemann01/bubbletree/badges/installer/conda.svg)](https://conda.anaconda.org/aemann01)
+[![Anaconda-Server Badge](https://anaconda.org/aemann01/bubbletree/badges/latest_release_date.svg)](https://anaconda.org/aemann01/bubbletree)
 
 ![example](img/figexample.png)
 
